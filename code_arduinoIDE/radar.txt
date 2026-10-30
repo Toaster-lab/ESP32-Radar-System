@@ -1,0 +1,53 @@
+#include <ESP32Servo.h>
+
+Servo myServo;          
+const int servopin = 6;
+int pos = 0;
+
+const int trigPin = 5;
+const int echoPin = 4;
+
+long duration;
+float distance;
+
+void calculate_distance();
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  myServo.attach(servopin); 
+}
+
+void loop() {
+  for(pos = 0; pos <= 180; pos += 2){
+    myServo.write(pos);
+    calculate_distance();
+    delay(30);
+  }
+  for(pos = 180; pos >= 0; pos -= 2){
+    myServo.write(pos);
+    calculate_distance();
+    delay(30);
+  }
+}
+
+void calculate_distance(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+
+  distance = duration * 0.0343 / 2;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm   ");
+  Serial.print("Angle: ");
+  Serial.print(pos);
+  Serial.println("°");
+}
